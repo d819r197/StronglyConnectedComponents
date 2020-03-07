@@ -60,6 +60,7 @@ class Graph():
             #For each node U in L[i]
             for u in L[i]:
                 if verbose: print("Current U: " + str(u.id+1))
+                T.append(u.id+1)
                 #Consider Each Edge (u,v)
                 for v in u.connectedNodes:
                     if verbose: print("Current V: " + str(v.id+1))
@@ -68,26 +69,28 @@ class Graph():
                         self.discovered[v.id] = True
 
                         #Add (u,v) to the tree
-                        if verbose: print("Adding (" + str(u.id+1) +","+str(v.id+1)+") to the tree")
-                        T.append((u.id+1,v.id+1))
+                        #if verbose: print("Adding (" + str(u.id+1) +","+str(v.id+1)+") to the tree")
+                        #T.append(v.id+1)
 
                         #Add v to the list L[i+1]
                         if verbose: print("Adding V: "+str(v.id+1)+" to the list L")
                         L[i+1].append(v)
+
+                        #if u.id == initNode.id:
+                            #T.append(u.id)
+                            #if verbose: print("INITAL NODE WAS FOUND!")
+                            #return T
+
             #Increment Layer Counter by 1
             i += 1
         if verbose:
             print("L[i] is empty")
             print("T: " + str(T))
-        if False in self.discovered:
-            if verbose: print("dfs at node: " + str(initNode.id+1) + " has failed")
-            return False
-        else:
-            if verbose: print("dfs at node: " + str(initNode.id+1) + " has passed")
-            return True
+        return T
 
-    def deriveConnectedComponents(self):
-        global verbose
+    def resetDiscovered(self):
+        for n in self.discovered:
+            n = False
 
 def importNodes(filePath):
     global verbose
@@ -126,9 +129,23 @@ def main():
 
     for n in range(len(g.nodeList)):
         bfs1 = g.bfs(g.nodeList[n])
-        bfs2 = grev.bfs(g.nodeList[n])
-        if bfs1 and bfs2:
-            scc.append(n+1)
+        bfs2 = grev.bfs(grev.nodeList[n])
+        intersection = []
+        if verbose: print("N: "+str(n+1)+" and BFS1: "+str(bfs1)+" and BFS2: "+str(bfs2))
+        #for n in bfs1:
+        #    if n in bfs2:
+        #        intersection.append(n)
+        for n in range(g.nodeCount):
+            if n+1 in bfs1 and n+1 in bfs2:
+                intersection.append(n+1)
+        intersection.sort()
+        if intersection not in scc:
+            scc.append(intersection)
+        else:
+            scc.append([])
+
+        g.resetDiscovered()
+        grev.resetDiscovered()
 
     if verbose:
         print("----------START G PRINT----------")
@@ -137,7 +154,11 @@ def main():
         print("---------START GREV PRINT---------")
         grev.printGraph()
         print("----------END GREV PRINT----------")
-    print("SCC Output: " + str(scc))
+
+    for i in scc:
+        for j in i:
+            print(str(j)+" ", end = '')
+        print("\n", end ='')
 
 if __name__ == "__main__":
     main()
