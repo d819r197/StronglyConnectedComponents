@@ -157,8 +157,11 @@ def main():
 
     for i in scc:
         for j in i:
-            print(str(j)+" ", end = '')
-        print("\n", end ='')
+            print(str(j), end = '')
+            if j != i[len(i)-1]:
+                print(' ', end = '')
+        if i != scc[len(scc)-1]:
+            print("\n", end ='')
 
 if __name__ == "__main__":
     main()
